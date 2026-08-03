@@ -1,0 +1,37 @@
+{
+  "calibration": {
+    "mse_min": 0.00017062602273654193,
+    "mse_max": 0.013580949045717716,
+    "cosine_min": 0.01096421480178833,
+    "cosine_max": 0.38314294815063477,
+    "threshold": 0.25062086248967574,
+    "threshold_method": "percentile"
+  },
+  "calibration_by_class": {
+    "0": {
+      "mse_min": 0.0012593246065080166,
+      "mse_max": 0.013580949045717716,
+      "cosine_min": 0.02190423011779785,
+      "cosine_max": 0.2125667929649353,
+      "threshold": 0.5078202329920098,
+      "threshold_method": "percentile"
+    },
+    "1": {
+      "mse_min": 0.00017062602273654193,
+      "mse_max": 0.007091303821653128,
+      "cosine_min": 0.01096421480178833,
+      "cosine_max": 0.38314294815063477,
+      "threshold": 0.23397182437120023,
+      "threshold_method": "percentile"
+    },
+    "2": {
+      "mse_min": 0.0003438090207055211,
+      "mse_max": 0.0038593930657953024,
+      "cosine_min": 0.010993003845214844,
+      "cosine_max": 0.11995655298233032,
+      "threshold": 0.4871282649844853,
+      "threshold_method": "percentile"
+    }
+  },
+  "normal_validation_cells": 3697
+}
