@@ -1,0 +1,15 @@
+model: yolov8n.pt
+epochs: 100
+batch: 16
+imgsz: 640
+lr0: 0.001
+optimizer: AdamW
+weight_decay: 0.0005
+workers: 2
+patience: 25
+seed: 42
+device: 0
+confidence: 0.10
+iou: 0.45
+project: outputs/yolo
+name: txl_pbc_yolov8n

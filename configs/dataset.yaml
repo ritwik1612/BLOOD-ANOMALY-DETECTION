@@ -1,0 +1,13 @@
+dataset_root: ../TXL-PBC_Dataset-master/TXL-PBC
+classes:
+  0: WBC
+  1: RBC
+  2: Platelets
+splits: [train, val, test]
+augmentation:
+  enabled: true
+  copies_per_image: 1
+  random_seed: 42
+  min_visibility: 0.25
+  crop_height: 560
+  crop_width: 560

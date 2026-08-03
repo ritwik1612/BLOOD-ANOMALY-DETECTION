@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BPD | Blood Cell Open-Set Analysis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div><p class="eyebrow">BPD • TXL-PBC</p><h1>Blood Cell Open-Set Analysis</h1><p class="subtle">YOLOv8 Nano localization with normal-morphology reconstruction scoring.</p></div>
+      <span id="status" class="status {{ 'ready' if ready else 'pending' }}">{{ 'Model ready' if ready else 'Preparing model artifacts' }}</span>
+    </header>
+    <section class="upload-card">
+      <form id="predict-form">
+        <label id="drop-zone" for="image"><strong>Upload peripheral blood smear</strong><span>PNG or JPEG • click or drag an image here</span><input id="image" name="image" type="file" accept="image/png,image/jpeg" required></label>
+        <div class="actions"><span id="filename">No image selected</span><button id="submit" type="submit">Analyse image</button></div>
+      </form>
+      <p id="message" role="status"></p>
+    </section>
+    <section id="results" hidden>
+      <div class="stats"><article><span>Cells detected</span><strong id="detected">0</strong></article><article><span>Abnormal cells</span><strong id="abnormal">0</strong></article></div>
+      <div class="images"><figure><figcaption>Open-set detections</figcaption><img id="annotated" alt="Annotated blood smear prediction"></figure><figure id="reconstruction-figure"><figcaption>Cell reconstructions</figcaption><img id="reconstruction" alt="Cell reconstruction comparison"></figure></div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

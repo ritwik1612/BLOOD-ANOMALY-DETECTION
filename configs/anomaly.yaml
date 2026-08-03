@@ -1,0 +1,20 @@
+weights:
+  mse: 0.5
+  cosine: 0.3
+  confidence: 0.2
+normalization:
+  method: minmax
+  epsilon: 1.0e-8
+threshold:
+  method: percentile
+  percentile: 95.0
+  std_multiplier: 3.0
+  minimum_detection_confidence_for_abnormal: 0.0
+  use_class_specific_calibration: false
+artifacts:
+  centroids: outputs/weights/centroids.pt
+  calibration: outputs/weights/anomaly_calibration.json
+class_labels:
+  0: WBC
+  1: RBC
+  2: Platelets

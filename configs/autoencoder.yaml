@@ -1,0 +1,13 @@
+patch_size: 64
+latent_dim: 128
+epochs: 100
+batch_size: 64
+learning_rate: 0.0001
+weight_decay: 0.00001
+num_workers: 2
+seed: 42
+device: null
+early_stopping_patience: 15
+checkpoint_path: outputs/weights/autoencoder_best.pt
+last_checkpoint_path: outputs/weights/autoencoder_last.pt
+tensorboard_dir: outputs/logs/autoencoder
