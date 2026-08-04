@@ -49,8 +49,16 @@ class OpenSetPipeline:
         abnormal_tags = {0: "AWBC", 1: "ARBC", 2: "APLAT"}
         return (abnormal_tags if abnormal else normal_tags)[class_id]
 
+    @staticmethod
+    def _contains_cell_foreground(patch: np.ndarray) -> bool:
+        """Reject mostly blank, low-stain boxes before anomaly scoring."""
+        hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
+        center = hsv[8:56, 8:56]
+        stained_pixels = (center[:, :, 1] >= 18) & (center[:, :, 2] <= 248)
+        return float(stained_pixels.mean()) >= 0.25
+
     @torch.inference_mode()
-    def analyze_array(self, image: np.ndarray, confidence: float = 0.10, iou: float = 0.45) -> list[dict]:
+    def analyze_array(self, image: np.ndarray, confidence: float = 0.15, iou: float = 0.45) -> list[dict]:
         result = self.detector.predict(
             source=image,
             conf=confidence,
@@ -65,7 +73,7 @@ class OpenSetPipeline:
                 continue
             xyxy = tuple(int(round(value)) for value in box.xyxy[0].tolist())
             patch = crop_and_resize(image, xyxy)
-            if patch is None:
+            if patch is None or not self._contains_cell_foreground(patch):
                 continue
             rgb_patch = cv2.cvtColor(patch, cv2.COLOR_BGR2RGB)
             tensor = torch.from_numpy(rgb_patch).permute(2, 0, 1).float().div(255).unsqueeze(0).to(self.device)
@@ -93,7 +101,7 @@ class OpenSetPipeline:
             detections.append(detection)
         return detections
 
-    def analyze_path(self, path: Path, confidence: float = 0.10, iou: float = 0.45) -> tuple[np.ndarray, list[dict]]:
+    def analyze_path(self, path: Path, confidence: float = 0.15, iou: float = 0.45) -> tuple[np.ndarray, list[dict]]:
         image = cv2.imread(str(path))
         if image is None:
             raise ValueError(f"Cannot read image: {path}")
