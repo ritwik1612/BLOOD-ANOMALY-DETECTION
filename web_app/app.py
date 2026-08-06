@@ -59,6 +59,11 @@ def status():
     return jsonify({"ready": artifacts_ready(), "missing": [path.name for path in REQUIRED_ARTIFACTS if not path.exists()]})
 
 
+@app.errorhandler(413)
+def file_too_large(_error):
+    return jsonify({"error": "The image is too large. Upload a PNG or JPEG smaller than 20 MB."}), 413
+
+
 @app.post("/api/predict")
 def predict():
     if "image" not in request.files:

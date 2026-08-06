@@ -10,6 +10,12 @@ patience: 25
 seed: 42
 device: 0
 confidence: 0.10
-iou: 0.45
+iou: 0.80
+inference:
+  enabled: true
+  tile_size: 640
+  tile_overlap: 0.25
+  tile_min_dimension: 720
+  max_det: 1000
 project: outputs/yolo
 name: txl_pbc_yolov8n

@@ -8,20 +8,57 @@
 </head>
 <body>
   <main class="shell">
-    <header>
-      <div><p class="eyebrow">BPD • TXL-PBC</p><h1>Blood Cell Open-Set Analysis</h1><p class="subtle">YOLOv8 Nano localization with normal-morphology reconstruction scoring.</p></div>
-      <span id="status" class="status {{ 'ready' if ready else 'pending' }}">{{ 'Model ready' if ready else 'Preparing model artifacts' }}</span>
+    <header class="topbar">
+      <a class="brand" href="#upload" aria-label="Back to upload">
+        <span class="brand-chip">BPD</span>
+        <span><span class="eyebrow">TXL-PBC / NORMAL-ONLY LEARNING</span><strong>Blood Cell Open-Set Analysis</strong></span>
+      </a>
+      <div class="runtime"><span class="runtime-light"></span><span>LOCAL INFERENCE</span><b>YOLOv8n + CAE</b></div>
     </header>
-    <section class="upload-card">
-      <form id="predict-form">
-        <label id="drop-zone" for="image"><strong>Upload peripheral blood smear</strong><span>PNG or JPEG • click or drag an image here</span><input id="image" name="image" type="file" accept="image/png,image/jpeg" required></label>
-        <div class="actions"><span id="filename">No image selected</span><button id="submit" type="submit">Analyse image</button></div>
-      </form>
-      <p id="message" role="status"></p>
+
+    <section id="upload-page" class="page-view" aria-labelledby="upload-heading">
+      <div class="command-strip">
+        <div><span class="section-label">PERIPHERAL BLOOD SMEAR</span><h1 id="upload-heading">Upload a specimen for analysis</h1><p>Cells are localized first, then compared with learned normal morphology.</p></div>
+        <span id="status" class="status {{ 'ready' if ready else 'pending' }}"><i></i>{{ 'MODEL READY' if ready else 'MODEL PREPARING' }}</span>
+      </div>
+
+      <section class="workspace-grid">
+        <section class="scanner-panel" aria-labelledby="upload-title">
+          <div class="panel-top"><span class="panel-kicker">01 / INPUT</span><span class="panel-code">PBS-IMAGE</span></div>
+          <div class="scanner-frame">
+            <div class="scan-corner corner-tl"></div><div class="scan-corner corner-tr"></div><div class="scan-corner corner-bl"></div><div class="scan-corner corner-br"></div>
+            <form id="predict-form">
+              <label id="drop-zone" for="image">
+                <span id="drop-empty" class="drop-empty"><span class="scan-icon">+</span><strong id="upload-title">Drop smear image here</strong><span>or choose a local PNG / JPEG</span><small>Enter submits after file selection</small></span>
+                <span id="preview-wrap" class="preview-wrap" hidden><img id="preview" alt="Selected smear preview"><span class="preview-hint">Click or drop another image to replace</span></span>
+                <input id="image" name="image" type="file" accept="image/png,image/jpeg" required>
+              </label>
+              <div class="action-row"><span id="filename">NO FILE SELECTED</span><button id="submit" type="submit" disabled>RUN ANALYSIS <b>↗</b></button></div>
+            </form>
+          </div>
+          <p id="message" role="status"></p>
+        </section>
+
+        <aside class="protocol-panel">
+          <div class="panel-top"><span class="panel-kicker">02 / WORKFLOW</span><span class="panel-code">OPEN-SET</span></div>
+          <div class="protocol-line"></div>
+          <ol class="protocol-list">
+            <li><span class="protocol-number">01</span><div><strong>Localize cells</strong><p>YOLOv8 Nano finds RBC, WBC, and platelet candidates.</p></div></li>
+            <li><span class="protocol-number">02</span><div><strong>Learn morphology</strong><p>64×64 cell crops pass through the normal-cell reconstruction network.</p></div></li>
+            <li><span class="protocol-number">03</span><div><strong>Review outliers</strong><p>Latent distance and reconstruction behaviour identify unfamiliar candidates.</p></div></li>
+          </ol>
+          <div class="protocol-footer"><span class="legend normal"><i></i>NORMAL</span><span class="legend abnormal"><i></i>OPEN-SET CANDIDATE</span></div>
+        </aside>
+      </section>
     </section>
-    <section id="results" hidden>
-      <div class="stats"><article><span>Cells detected</span><strong id="detected">0</strong></article><article><span>Abnormal cells</span><strong id="abnormal">0</strong></article></div>
-      <div class="images"><figure><figcaption>Open-set detections</figcaption><img id="annotated" alt="Annotated blood smear prediction"></figure><figure id="reconstruction-figure"><figcaption>Cell reconstructions</figcaption><img id="reconstruction" alt="Cell reconstruction comparison"></figure></div>
+
+    <section id="results-page" class="page-view results-page" hidden aria-labelledby="results-heading" aria-live="polite">
+      <div class="results-heading">
+        <div><span class="section-label">03 / OUTPUT</span><h1 id="results-heading">Analysis result</h1><p>Review the localized cells and morphology outliers from this specimen.</p></div>
+        <button id="new-sample" class="secondary-button" type="button">CHECK ANOTHER SAMPLE <b>↩</b></button>
+      </div>
+      <div class="stats"><article><span>CELLS DETECTED</span><strong id="detected">0</strong><small>Localized candidates</small></article><article class="alert-stat"><span>ABNORMAL CELLS</span><strong id="abnormal">0</strong><small>Open-set candidates</small></article></div>
+      <div class="images"><figure><figcaption>Open-set detections <small>GREEN / RED BOXES</small></figcaption><img id="annotated" alt="Annotated blood smear prediction"></figure><figure id="reconstruction-figure"><figcaption>Priority reconstructions <small>FLAGGED CELLS FIRST</small></figcaption><img id="reconstruction" alt="Prioritized cell reconstruction comparison"></figure></div>
     </section>
   </main>
   <script src="{{ url_for('static', filename='app.js') }}"></script>

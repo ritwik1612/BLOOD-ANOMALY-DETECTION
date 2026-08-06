@@ -23,10 +23,15 @@ def draw_open_set_detections(image: np.ndarray, detections: list[dict]) -> np.nd
 def save_reconstruction_grid(rows: list[dict], output_path: Path) -> None:
     if not rows:
         return
-    count = min(12, len(rows))
+    prioritized_rows = sorted(
+        rows,
+        key=lambda item: (item.get("status") == "Abnormal", item.get("anomaly_score", 0.0)),
+        reverse=True,
+    )
+    count = min(12, len(prioritized_rows))
     figure, axes = plt.subplots(count, 2, figsize=(5, 2.5 * count))
     axes = np.atleast_2d(axes)
-    for index, item in enumerate(rows[:count]):
+    for index, item in enumerate(prioritized_rows[:count]):
         axes[index, 0].imshow(cv2.cvtColor(item["patch"], cv2.COLOR_BGR2RGB))
         axes[index, 0].set_title(f"Input: {item['display_label']}")
         axes[index, 1].imshow(item["reconstruction"])
