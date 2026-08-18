@@ -16,7 +16,8 @@ def draw_open_set_detections(image: np.ndarray, detections: list[dict]) -> np.nd
         left, top, right, bottom = (int(value) for value in item["xyxy"])
         color = (0, 170, 0) if item["status"] == "Normal" else (0, 0, 220)
         cv2.rectangle(canvas, (left, top), (right, bottom), color, 2)
-        cv2.putText(canvas, item["display_label"], (left, max(18, top - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 2, cv2.LINE_AA)
+        label = "Anomaly" if item["status"] == "Abnormal" else item["display_label"]
+        cv2.putText(canvas, label, (left, max(18, top - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, color, 2, cv2.LINE_AA)
     return canvas
 
 
@@ -33,7 +34,8 @@ def save_reconstruction_grid(rows: list[dict], output_path: Path) -> None:
     axes = np.atleast_2d(axes)
     for index, item in enumerate(prioritized_rows[:count]):
         axes[index, 0].imshow(cv2.cvtColor(item["patch"], cv2.COLOR_BGR2RGB))
-        axes[index, 0].set_title(f"Input: {item['display_label']}")
+        label = "Anomaly" if item["status"] == "Abnormal" else item["display_label"]
+        axes[index, 0].set_title(f"Input: {label}")
         axes[index, 1].imshow(item["reconstruction"])
         axes[index, 1].set_title("Reconstruction")
         for axis in axes[index]:
