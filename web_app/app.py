@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-import time
+import base64
+import mimetypes
+import os
 import sys
+import tempfile
+import time
 from pathlib import Path
 
 import cv2
@@ -17,8 +21,10 @@ from utils.visualization import draw_open_set_detections, save_reconstruction_gr
 
 
 APP_ROOT = Path(__file__).resolve().parent
-UPLOAD_DIR = APP_ROOT / "static" / "uploads"
-RESULT_DIR = APP_ROOT / "static" / "results"
+RUNNING_ON_VERCEL = bool(os.getenv("VERCEL"))
+RUNTIME_ROOT = Path(tempfile.gettempdir()) / "bpd-open-set" if RUNNING_ON_VERCEL else APP_ROOT / "static"
+UPLOAD_DIR = RUNTIME_ROOT / "uploads"
+RESULT_DIR = RUNTIME_ROOT / "results"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 REQUIRED_ARTIFACTS = [
     PROJECT_ROOT / "outputs" / "weights" / "yolov8n_txl_pbc_best.pt",
@@ -37,6 +43,15 @@ _pipeline = None
 
 def artifacts_ready() -> bool:
     return all(path.exists() for path in REQUIRED_ARTIFACTS)
+
+
+def image_response_url(path: Path, static_filename: str) -> str:
+    """Return a static URL locally and an inline image from Vercel's ephemeral runtime."""
+    if not RUNNING_ON_VERCEL:
+        return url_for("static", filename=static_filename)
+    mime_type = mimetypes.guess_type(path.name)[0] or "image/png"
+    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+    return f"data:{mime_type};base64,{encoded}"
 
 
 def get_pipeline():
@@ -101,9 +116,9 @@ def predict():
                 "abnormal_cells": sum(row["status"] == "Abnormal" for row in rows),
                 "threshold": round(float(pipeline.threshold), 4),
                 "detections": rows,
-                "input_url": url_for("static", filename=f"uploads/{filename}"),
-                "annotated_url": url_for("static", filename=f"results/{annotated_name}"),
-                "reconstruction_url": url_for("static", filename=f"results/{reconstruction_name}") if detections else None,
+                "input_url": image_response_url(upload_path, f"uploads/{filename}"),
+                "annotated_url": image_response_url(RESULT_DIR / annotated_name, f"results/{annotated_name}"),
+                "reconstruction_url": image_response_url(RESULT_DIR / reconstruction_name, f"results/{reconstruction_name}") if detections else None,
             }
         )
     except Exception as error:
@@ -111,4 +126,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5050, debug=False, threaded=False)
+    app.run(host="127.0.0.1", port=5051, debug=False, threaded=False)

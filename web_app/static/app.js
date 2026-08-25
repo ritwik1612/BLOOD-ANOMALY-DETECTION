@@ -25,6 +25,10 @@ function showResultsPage() {
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+function displayImageUrl(url) {
+  return url.startsWith('data:') ? url : `${url}?t=${Date.now()}`;
+}
+
 function resetUpload() {
   form.reset();
   input.value = '';
@@ -101,10 +105,10 @@ form.addEventListener('submit', async event => {
     if (!response.ok) throw new Error(data.error || 'Analysis failed.');
     document.querySelector('#detected').textContent = data.cells_detected;
     document.querySelector('#abnormal').textContent = data.abnormal_cells;
-    document.querySelector('#annotated').src = `${data.annotated_url}?t=${Date.now()}`;
+    document.querySelector('#annotated').src = displayImageUrl(data.annotated_url);
     const reconstruction = document.querySelector('#reconstruction-figure');
     reconstruction.hidden = !data.reconstruction_url;
-    if (data.reconstruction_url) document.querySelector('#reconstruction').src = `${data.reconstruction_url}?t=${Date.now()}`;
+    if (data.reconstruction_url) document.querySelector('#reconstruction').src = displayImageUrl(data.reconstruction_url);
     hasResults = true;
     history.pushState({ view: 'results' }, '', '#results');
     showResultsPage();

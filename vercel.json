@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{web_app/**,anomaly_detection/**,feature_extraction/**,inference/**,models/**,utils/**,configs/**,outputs/weights/yolov8n_txl_pbc_best.pt,outputs/weights/autoencoder_best.pt,outputs/weights/centroids.pt,outputs/weights/anomaly_calibration.json}",
+      "memory": 3009,
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
+}
